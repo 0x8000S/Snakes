@@ -2,4 +2,4 @@
 要想运行请下载Pygame
 ```
 pip install pygame
-```bash
+```
