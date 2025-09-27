@@ -13,11 +13,11 @@ class Button():
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
-
+        self.TouchInterval = 0.2
     def get_rect(self) -> pygame.Rect:
         return self.rect
 
-    def draw(self, surface, bg=(0, 0, 0), lg=(255, 255, 255), pg=(255, 0, 0)) -> None:
+    def draw(self, surface, bg=(0, 153, 204), lg=(255, 255, 255), pg=(0, 102, 102)) -> None:
         pygame.draw.rect(surface, bg, (self.rect.x, self.rect.y, self.image.get_width(), self.image.get_height()))
         self.bc = pygame.draw.rect(surface, lg,
                                    (self.rect.x, self.rect.y, self.image.get_width(), self.image.get_height()), 3)
@@ -30,7 +30,8 @@ class Button():
         pos = pygame.mouse.get_pos()
         if self.bc.collidepoint(pos):
             if pygame.mouse.get_pressed()[0]:
-                time.sleep(0.2)
+                if self.TouchInterval != 0:
+                    time.sleep(self.TouchInterval)
                 return True
         else:
             return False

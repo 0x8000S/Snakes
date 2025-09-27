@@ -3,8 +3,8 @@
 # 文件夹内的Button.py是自定义的按钮类，请不要修改,同时它也要和snake.py放在同一目录下。
 # 运行时会在当前目录生成data.pkl文件，为游戏的配置文件(请勿删除)。
 # 作者：氢気氚 | qinch，邮箱：BlueRectS@outlook.com
-# 版本：v1.0.1
-# 最后编辑时间：2024年8月27日 14:23:16
+# 版本：v1.1.1
+# 最后编辑时间：2025年09月27日 23:23:16
 
 import pygame
 import sys
@@ -15,24 +15,31 @@ import pickle
 MUTOS_B = False
 BJPZ_B = True
 SSCD_B = False
+TouchMode = False
 try:
     with open('data.pkl', 'rb') as f:
         MUTOS_B = pickle.load(f)
         BJPZ_B = pickle.load(f)
         SSCD_B = pickle.load(f)
+        TouchMode = pickle.load(f)
 except FileNotFoundError:
     with open('data.pkl', 'wb') as f:
         pickle.dump(MUTOS_B,f)
         pickle.dump(BJPZ_B,f)
         pickle.dump(SSCD_B,f)
+        pickle.dump(TouchMode,f)
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("贪吃蛇")
+pygame.display.set_caption("贪吃蛇-v1.1.1")
 screen_rect = screen.get_rect()
 direction = 'R'
 N_direction = 'R'
 snake_h = [40, 10]
 snake_b = [[40, 10], [50, 10], [60, 10]]
 food = [300, 400]
+MainViewColor = (0,153,204)
+AColor = (32, 158, 133)
+UColor = (194, 70, 48)
+
 game = 'M'
 title_text = "贪吃蛇"
 
@@ -58,12 +65,29 @@ BJPZ_R.topleft = screen_rect.width/2-BJPZ_R.width/2, 250
 SSCD = Button.Button("蛇身重叠", 0,0, font_size=40)
 SSCD_R = SSCD.get_rect()
 SSCD_R.topleft = screen_rect.width/2-SSCD_R.width/2, 300
+Touch = Button.Button("触控模式", 0,0, font_size=40)
+Touch_R = Touch.get_rect()
+Touch.rect.topleft = screen_rect.width/2-Touch_R.width/2, 350
 Back = Button.Button("返回", 0,0, font_size=40)
 Back_R = Back.get_rect()
-Back_R.topleft = screen_rect.width/2-Back_R.width/2, 350
+Back_R.topleft = screen_rect.width/2-Back_R.width/2, 400
 REST = Button.Button("主菜单", 0,0, font_size=40)
 REST_R = REST.get_rect()
 REST_R.topleft = screen_rect.width/2-REST_R.width/2, 350
+TouchEsc = Button.Button("菜单", 0, 0, font_size=40)
+TouchEsc_R = TouchEsc.get_rect()
+TouchW = Button.Button(" W ", 40, 440, font_size=52)
+TouchW.TouchInterval = 0
+TouchW_R = TouchW.get_rect()
+TouchA = Button.Button(" A ", 40-TouchW_R.width+TouchW_R.width/2, TouchW_R.y+TouchW_R.height, font_size=52)
+TouchA.TouchInterval = 0
+TouchA_R = TouchA.get_rect()
+TouchD = Button.Button(" D ", 40+TouchW_R.width-TouchW_R.width/2, TouchW_R.y+TouchW_R.height, font_size=52)
+TouchD.TouchInterval = 0
+TouchD_R = TouchD.get_rect()
+TouchS = Button.Button(" S ", 40, TouchD_R.y+TouchD_R.height, font_size=52)
+TouchS.TouchInterval = 0
+TouchS_R = TouchS.get_rect()
 Clock = pygame.time.Clock()
 Play.draw(screen)
 Settings.draw(screen)
@@ -73,6 +97,12 @@ BJPZ.draw(screen)
 SSCD.draw(screen)
 Back.draw(screen)
 REST.draw(screen)
+Touch.draw(screen)
+TouchEsc.draw(screen)
+TouchW.draw(screen)
+TouchA.draw(screen)
+TouchD.draw(screen)
+TouchS.draw(screen)
 E = ""
 while True:
     
@@ -86,14 +116,13 @@ while True:
                 game = 'P'
             if Settings.get_button_state():
                 game = 'S'
-        screen.fill((0, 63, 54))
         Title = font.render(title_text, True, (255,255,255))
         title_text = "贪吃蛇"
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
         Play = Button.Button("开始",0,0, font_size=40)
         Play_R = Play.get_rect()
         Play_R.topleft = screen_rect.width/2-Play_R.width/2, 200
-        screen.fill((0, 63, 54))
+        screen.fill(MainViewColor)
         Title = font.render(title_text, True, (255,255,255))
         title_text = "暂停"
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
@@ -125,7 +154,7 @@ while True:
         Play = Button.Button("继续",0,0, font_size=40)
         Play_R = Play.get_rect()
         Play_R.topleft = screen_rect.width/2-Play_R.width/2, 200
-        screen.fill((0, 63, 54))
+        screen.fill(MainViewColor)
         Title = font.render(title_text, True, (255,255,255))
         title_text = "暂停"
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
@@ -149,48 +178,53 @@ while True:
                     game = 'M'
                     E = ""
             if MUTOS.get_button_state():
-                if MUTOS_B:
-                    MUTOS_B = False
-                else:
-                    MUTOS_B = True
+                MUTOS_B = not MUTOS_B
                 with open('data.pkl', 'wb') as f:
                     pickle.dump(MUTOS_B,f)
                     pickle.dump(BJPZ_B,f)
                     pickle.dump(SSCD_B, f)
+                    pickle.dump(TouchMode, f)
             if BJPZ.get_button_state():
-                if BJPZ_B:
-                    BJPZ_B = False
-                else:
-                    BJPZ_B = True
+                BJPZ_B = not BJPZ_B
                 with open('data.pkl', 'wb') as f:
                     pickle.dump(MUTOS_B,f)
                     pickle.dump(BJPZ_B,f)
                     pickle.dump(SSCD_B, f)
+                    pickle.dump(TouchMode, f)
             if SSCD.get_button_state():
-                if SSCD_B:
-                    SSCD_B = False
-                else:
-                    SSCD_B = True
+                SSCD_B = not SSCD_B
                 with open('data.pkl', 'wb') as f:
                     pickle.dump(MUTOS_B,f)
                     pickle.dump(BJPZ_B,f)
                     pickle.dump(SSCD_B, f)
+                    pickle.dump(TouchMode, f)
+            if Touch.get_button_state():
+                TouchMode = not TouchMode
+                with open('data.pkl', 'wb') as f:
+                    pickle.dump(MUTOS_B,f)
+                    pickle.dump(BJPZ_B,f)
+                    pickle.dump(SSCD_B, f)
+                    pickle.dump(TouchMode, f)
         Title = font.render(title_text, True, (255,255,255))
         title_text = "设置"
-        screen.fill((0, 63, 54))
+        screen.fill(MainViewColor)
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
         if MUTOS_B:
-            MUTOS.draw(screen, (0,255,0))
+            MUTOS.draw(screen, UColor)
         else:
-            MUTOS.draw(screen, (255,0,0))
+            MUTOS.draw(screen, AColor)
         if BJPZ_B:
-            BJPZ.draw(screen, (0,255,0))
+            BJPZ.draw(screen, UColor)
         else:
-            BJPZ.draw(screen, (255,0,0))
+            BJPZ.draw(screen, AColor)
         if SSCD_B:
-            SSCD.draw(screen, (0,255,0))
+            SSCD.draw(screen, UColor)
         else:
-            SSCD.draw(screen, (255,0,0))
+            SSCD.draw(screen, AColor)
+        if TouchMode:
+            Touch.draw(screen, UColor)
+        else:
+            Touch.draw(screen, AColor)
         Back.draw(screen)
         pygame.display.update()
     if game == 'P':
@@ -220,6 +254,27 @@ while True:
                         direction = 'U'
                     if event.key == pygame.K_DOWN and direction != 'U':
                         direction = 'D'
+        if TouchMode:
+            if TouchEsc.get_button_state():
+                game = 'E'
+            if MUTOS_B:
+                if TouchD.get_button_state():
+                    direction = 'R'
+                if TouchA.get_button_state():
+                    direction = 'L'
+                if TouchW.get_button_state():
+                    direction = 'U'
+                if TouchS.get_button_state():
+                    direction = 'D'
+            else:
+                if TouchD.get_button_state() and direction != 'L':
+                    direction = 'R'
+                if TouchA.get_button_state() and direction != 'R':
+                    direction = 'L'
+                if TouchW.get_button_state() and direction != 'D':
+                    direction = 'U'
+                if TouchS.get_button_state() and direction != 'U':
+                    direction = 'D'
         if direction == 'R':
             snake_h[0] += 10
         if direction == 'L':
@@ -244,9 +299,14 @@ while True:
         if snake_h[0] > 800 or snake_h[0] < 0 or snake_h[1] < 0 or snake_h[1] > 600:
             if BJPZ_B:
                 game = 'D'
-        
-        screen.fill((0,0,0))
-        pygame.draw.rect(screen, (255,0,0), pygame.Rect(food[0], food[1], 10, 10))
+        screen.fill((13,62,77))
+        if TouchMode:
+            TouchW.draw(screen)
+            TouchS.draw(screen)
+            TouchD.draw(screen)
+            TouchA.draw(screen)
+            TouchEsc.draw(screen)
+        pygame.draw.rect(screen, (218,118,91), pygame.Rect(food[0], food[1], 10, 10))
         for pos in snake_b:
             pygame.draw.rect(screen, (0,255,0), pygame.Rect(pos[0], pos[1], 10, 10))
         
@@ -267,7 +327,7 @@ while True:
         Title = font.render(title_text, True, (255,0,0))
         title_text = "你寄了"
         
-        screen.fill((0, 63, 54))
+        screen.fill(MainViewColor)
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
         REST.draw(screen)
         pygame.display.update()
