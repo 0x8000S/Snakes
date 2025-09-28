@@ -16,18 +16,21 @@ MUTOS_B = False
 BJPZ_B = True
 SSCD_B = False
 TouchMode = False
+Guideline = False
 try:
     with open('data.pkl', 'rb') as f:
         MUTOS_B = pickle.load(f)
         BJPZ_B = pickle.load(f)
         SSCD_B = pickle.load(f)
         TouchMode = pickle.load(f)
+        Guideline = pickle.load(f)
 except FileNotFoundError:
     with open('data.pkl', 'wb') as f:
         pickle.dump(MUTOS_B,f)
         pickle.dump(BJPZ_B,f)
         pickle.dump(SSCD_B,f)
         pickle.dump(TouchMode,f)
+        pickle.dump(Guideline, f)
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("贪吃蛇-v1.1.1")
 screen_rect = screen.get_rect()
@@ -42,9 +45,11 @@ UColor = (194, 70, 48)
 
 game = 'M'
 title_text = "贪吃蛇"
-
+sc = 0
 font = pygame.font.SysFont("SimHei", 40)
 Title = font.render(title_text, True, (255,255,255))
+Score = font.render(f"得分:{sc}", True, (255,255,255))
+Score_rect = Score.get_rect()
 Play = Button.Button("开始",0,0, font_size=40)
 Play_R = Play.get_rect()
 Play_R.topleft = screen_rect.width/2-Play_R.width/2, 200
@@ -68,9 +73,12 @@ SSCD_R.topleft = screen_rect.width/2-SSCD_R.width/2, 300
 Touch = Button.Button("触控模式", 0,0, font_size=40)
 Touch_R = Touch.get_rect()
 Touch.rect.topleft = screen_rect.width/2-Touch_R.width/2, 350
+GuiLinesS = Button.Button("开启辅助线", 0,0, font_size=40)
+GuiLinesS_R = GuiLinesS.get_rect()
+GuiLinesS.rect.topleft = screen_rect.width/2-GuiLinesS_R.width/2, 400
 Back = Button.Button("返回", 0,0, font_size=40)
 Back_R = Back.get_rect()
-Back_R.topleft = screen_rect.width/2-Back_R.width/2, 400
+Back_R.topleft = screen_rect.width/2-Back_R.width/2, 450
 REST = Button.Button("主菜单", 0,0, font_size=40)
 REST_R = REST.get_rect()
 REST_R.topleft = screen_rect.width/2-REST_R.width/2, 350
@@ -78,15 +86,19 @@ TouchEsc = Button.Button("菜单", 0, 0, font_size=40)
 TouchEsc_R = TouchEsc.get_rect()
 TouchW = Button.Button(" W ", 40, 440, font_size=52)
 TouchW.TouchInterval = 0
+TouchW.hover = True
 TouchW_R = TouchW.get_rect()
 TouchA = Button.Button(" A ", 40-TouchW_R.width+TouchW_R.width/2, TouchW_R.y+TouchW_R.height, font_size=52)
 TouchA.TouchInterval = 0
+TouchA.hover = True
 TouchA_R = TouchA.get_rect()
 TouchD = Button.Button(" D ", 40+TouchW_R.width-TouchW_R.width/2, TouchW_R.y+TouchW_R.height, font_size=52)
 TouchD.TouchInterval = 0
+TouchD.hover = True
 TouchD_R = TouchD.get_rect()
 TouchS = Button.Button(" S ", 40, TouchD_R.y+TouchD_R.height, font_size=52)
 TouchS.TouchInterval = 0
+TouchS.hover = True
 TouchS_R = TouchS.get_rect()
 Clock = pygame.time.Clock()
 Play.draw(screen)
@@ -103,6 +115,7 @@ TouchW.draw(screen)
 TouchA.draw(screen)
 TouchD.draw(screen)
 TouchS.draw(screen)
+GuiLinesS.draw(screen)
 E = ""
 while True:
     
@@ -117,6 +130,7 @@ while True:
             if Settings.get_button_state():
                 game = 'S'
         Title = font.render(title_text, True, (255,255,255))
+        sc = 0
         title_text = "贪吃蛇"
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
         Play = Button.Button("开始",0,0, font_size=40)
@@ -184,6 +198,7 @@ while True:
                     pickle.dump(BJPZ_B,f)
                     pickle.dump(SSCD_B, f)
                     pickle.dump(TouchMode, f)
+                    pickle.dump(Guideline, f)
             if BJPZ.get_button_state():
                 BJPZ_B = not BJPZ_B
                 with open('data.pkl', 'wb') as f:
@@ -191,6 +206,7 @@ while True:
                     pickle.dump(BJPZ_B,f)
                     pickle.dump(SSCD_B, f)
                     pickle.dump(TouchMode, f)
+                    pickle.dump(Guideline, f)
             if SSCD.get_button_state():
                 SSCD_B = not SSCD_B
                 with open('data.pkl', 'wb') as f:
@@ -198,6 +214,7 @@ while True:
                     pickle.dump(BJPZ_B,f)
                     pickle.dump(SSCD_B, f)
                     pickle.dump(TouchMode, f)
+                    pickle.dump(Guideline, f)
             if Touch.get_button_state():
                 TouchMode = not TouchMode
                 with open('data.pkl', 'wb') as f:
@@ -205,30 +222,43 @@ while True:
                     pickle.dump(BJPZ_B,f)
                     pickle.dump(SSCD_B, f)
                     pickle.dump(TouchMode, f)
+                    pickle.dump(Guideline, f)
+            if GuiLinesS.get_button_state():
+                Guideline = not Guideline
+                with open('data.pkl', 'wb') as f:
+                    pickle.dump(MUTOS_B,f)
+                    pickle.dump(BJPZ_B,f)
+                    pickle.dump(SSCD_B, f)
+                    pickle.dump(TouchMode, f)
+                    pickle.dump(Guideline, f)
         Title = font.render(title_text, True, (255,255,255))
         title_text = "设置"
         screen.fill(MainViewColor)
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
         if MUTOS_B:
-            MUTOS.draw(screen, UColor)
-        else:
             MUTOS.draw(screen, AColor)
+        else:
+            MUTOS.draw(screen, UColor)
         if BJPZ_B:
-            BJPZ.draw(screen, UColor)
-        else:
             BJPZ.draw(screen, AColor)
+        else:
+            BJPZ.draw(screen, UColor)
         if SSCD_B:
-            SSCD.draw(screen, UColor)
-        else:
             SSCD.draw(screen, AColor)
-        if TouchMode:
-            Touch.draw(screen, UColor)
         else:
+            SSCD.draw(screen, UColor)
+        if TouchMode:
             Touch.draw(screen, AColor)
+        else:
+            Touch.draw(screen, UColor)
+        if Guideline:
+            GuiLinesS.draw(screen, AColor)
+        else:
+            GuiLinesS.draw(screen, UColor)
         Back.draw(screen)
         pygame.display.update()
     if game == 'P':
-        Clock.tick(10)
+        Clock.tick(5)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -293,6 +323,7 @@ while True:
             fx, fy = int(fx), int(fy)
             print(fx, fy)
             food = [fx, fy]
+            sc += 1
         else:
             snake_b.pop()
         snake_b.insert(0, [snake_h[0], snake_h[1]])
@@ -300,12 +331,19 @@ while True:
             if BJPZ_B:
                 game = 'D'
         screen.fill((13,62,77))
+        Score = font.render(f"得分:{sc}", True, (255,255,255))
+        screen.blit(Score, (0, 40))
         if TouchMode:
             TouchW.draw(screen)
             TouchS.draw(screen)
             TouchD.draw(screen)
             TouchA.draw(screen)
             TouchEsc.draw(screen)
+        if Guideline:
+            for i in range(0, 801, 10):
+                pygame.draw.rect(screen, (24, 70, 84), pygame.Rect(i, snake_h[1], 10, 10))
+            for i in range(0, 601, 10):
+                pygame.draw.rect(screen, (24, 70, 84), pygame.Rect(snake_h[0], i, 10, 10))
         pygame.draw.rect(screen, (218,118,91), pygame.Rect(food[0], food[1], 10, 10))
         for pos in snake_b:
             pygame.draw.rect(screen, (0,255,0), pygame.Rect(pos[0], pos[1], 10, 10))
@@ -326,8 +364,9 @@ while True:
                 E = ""
         Title = font.render(title_text, True, (255,0,0))
         title_text = "你寄了"
-        
+        Score = font.render(f"得分:{sc}", True, (255,255,255))
         screen.fill(MainViewColor)
         screen.blit(Title, (screen_rect.width/2-Title_rect.width/2,100))
+        screen.blit(Score, (screen_rect.width/2-Score_rect.width/2, 150))
         REST.draw(screen)
         pygame.display.update()

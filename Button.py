@@ -14,6 +14,7 @@ class Button():
         self.rect.topleft = (x, y)
         self.clicked = False
         self.TouchInterval = 0.2
+        self.hover = False
     def get_rect(self) -> pygame.Rect:
         return self.rect
 
@@ -29,9 +30,12 @@ class Button():
     def get_button_state(self) -> bool:
         pos = pygame.mouse.get_pos()
         if self.bc.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0]:
-                if self.TouchInterval != 0:
-                    time.sleep(self.TouchInterval)
+            if not self.hover:
+                if pygame.mouse.get_pressed()[0]:
+                    if self.TouchInterval != 0:
+                        time.sleep(self.TouchInterval)
+                    return True
+            else:
                 return True
         else:
             return False
